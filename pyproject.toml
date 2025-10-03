@@ -15,9 +15,8 @@ dependencies = [
     "fsspec[gcs]>=2024.6.0",
     "gym-aloha>=0.1.1",
     "imageio>=2.36.1",
-    "jax[cuda12]==0.5.3",
+    "jax==0.5.3",
     "jaxtyping==0.2.36",
-    "lerobot",
     "ml_collections==1.0.0",
     "numpy>=1.22.4,<2.0.0",
     "numpydantic>=1.6.6",
@@ -26,7 +25,6 @@ dependencies = [
     "orbax-checkpoint==0.11.13",
     "pillow>=11.0.0",
     "sentencepiece>=0.2.0",
-    "torch==2.7.1",
     "tqdm-loggable>=0.2",
     "typing-extensions>=4.12.2",
     "tyro>=0.9.5",
@@ -37,6 +35,13 @@ dependencies = [
     "transformers==4.53.2",
     "rich>=14.0.0",
     "polars>=1.30.0",
+]
+
+[project.optional-dependencies]
+torch = [
+    "torch==2.7.1",
+    "torchvision==0.22.1",
+    "torchaudio==2.7.1",
 ]
 
 
@@ -64,7 +69,6 @@ override-dependencies = ["ml-dtypes==0.4.1", "tensorstore==0.1.74"]
 
 [tool.uv.sources]
 openpi-client = { workspace = true }
-lerobot = { git = "https://github.com/huggingface/lerobot", rev = "0cf864870cf29f4738d3ade893e6fd13fbd7cdb5" }
 dlimp = { git = "https://github.com/kvablack/dlimp", rev = "ad72ce3a9b414db2185bc0b38461d4101a65477a" }
 
 [tool.uv.workspace]

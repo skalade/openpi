@@ -7,7 +7,6 @@ from typing import Literal, Protocol, SupportsIndex, TypeVar
 
 import jax
 import jax.numpy as jnp
-import lerobot.common.datasets.lerobot_dataset as lerobot_dataset
 import numpy as np
 import torch
 
@@ -136,6 +135,14 @@ def create_torch_dataset(
         raise ValueError("Repo ID is not set. Cannot create dataset.")
     if repo_id == "fake":
         return FakeDataset(model_config, num_samples=1024)
+
+    try:
+        import lerobot.common.datasets.lerobot_dataset as lerobot_dataset
+    except ImportError as exc:
+        raise ImportError(
+            "lerobot is required to load datasets from the Hugging Face Hub. "
+            "Install it separately (for example: `pip install --no-deps git+https://github.com/huggingface/lerobot@0cf864870cf29f4738d3ade893e6fd13fbd7cdb5`)."
+        ) from exc
 
     dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
     dataset = lerobot_dataset.LeRobotDataset(

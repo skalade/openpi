@@ -49,7 +49,21 @@ GIT_LFS_SKIP_SMUDGE=1 uv sync
 GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .
 ```
 
-NOTE: `GIT_LFS_SKIP_SMUDGE=1` is needed to pull LeRobot as a dependency.
+NOTE: `GIT_LFS_SKIP_SMUDGE=1` keeps git from downloading the large LFS assets that ship with LeRobot.
+
+### ROCm 7.0 Docker setup
+
+If you are working inside the `rocm/pytorch:rocm7.0_ubuntu24.04_py3.12_pytorch_release_2.7.1` image, PyTorch (and ROCm libraries) are already installed system-wide. To reuse those binaries without attempting to download CUDA wheels:
+
+```bash
+uv sync
+uv pip install -r requirements/lerobot-no-torch.txt
+uv pip install --no-deps git+https://github.com/huggingface/lerobot@0cf864870cf29f4738d3ade893e6fd13fbd7cdb5
+```
+
+The first command installs the core OpenPI dependencies. The second installs the subset of LeRobot requirements that do not ship PyTorch wheels, and the last command installs LeRobot itself while reusing the pre-installed ROCm build of PyTorch. After these steps, `python -c "import torch; import lerobot"` should succeed inside the container.
+
+For environments that need a pip-installed PyTorch (e.g. CUDA), you can opt into the optional dependencies declared under the `torch` extra: `uv pip install .[torch]`.
 
 **Docker**: As an alternative to uv installation, we provide instructions for installing openpi using Docker. If you encounter issues with your system setup, consider using Docker to simplify installation. See [Docker Setup](docs/docker.md) for more details.
 
