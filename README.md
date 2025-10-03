@@ -56,12 +56,29 @@ NOTE: `GIT_LFS_SKIP_SMUDGE=1` keeps git from downloading the large LFS assets th
 If you are working inside the `rocm/pytorch:rocm7.0_ubuntu24.04_py3.12_pytorch_release_2.7.1` image, PyTorch (and ROCm libraries) are already installed system-wide. To reuse those binaries without attempting to download CUDA wheels:
 
 ```bash
+rm -rf .venv
+uv venv --system-site-packages
 uv sync
 uv pip install -r requirements/lerobot-no-torch.txt
 uv pip install --no-deps git+https://github.com/huggingface/lerobot@0cf864870cf29f4738d3ade893e6fd13fbd7cdb5
 ```
 
-The first command installs the core OpenPI dependencies. The second installs the subset of LeRobot requirements that do not ship PyTorch wheels, and the last command installs LeRobot itself while reusing the pre-installed ROCm build of PyTorch. After these steps, `python -c "import torch; import lerobot"` should succeed inside the container.
+`uv venv --system-site-packages` reuses the PyTorch bits that ship with the container instead of pulling CUDA wheels. The following two commands install the core OpenPI dependencies and the LeRobot extras that do not bundle PyTorch, and the last command installs LeRobot itself while reusing the pre-installed ROCm build. After these steps, `uv run python -c "import torch; import lerobot"` should succeed inside the container.
+
+If you prefer not to use `uv`, the same setup can be accomplished with stdlib tooling while still reusing the container’s PyTorch install:
+
+```bash
+rm -rf .venv
+python3.12 -m venv .venv --system-site-packages  # adjust if torch lives under a different interpreter
+source .venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install -e .
+pip install -r requirements/lerobot-no-torch.txt
+pip install --no-deps git+https://github.com/huggingface/lerobot@0cf864870cf29f4738d3ade893e6fd13fbd7cdb5
+python -c "import torch, lerobot; print(torch.__version__)"
+```
+
+Using `--system-site-packages` keeps the ROCm-aware torch provided by the image while the editable install keeps OpenPI code synced to the working tree.
 
 For environments that need a pip-installed PyTorch (e.g. CUDA), you can opt into the optional dependencies declared under the `torch` extra: `uv pip install .[torch]`.
 
